@@ -8,4 +8,12 @@ class Card:
 
     def get_value(self):
         return self._value if self._visible else None
-    
+
+    def peak(self):
+        return self._value
+
+    def __str__(self):
+        return "{:<2}".format(str(self._value) if self._visible else "?")
+
+    def __repr__(self):
+        return "{:<2}".format(str(self._value) if self._visible else "?")

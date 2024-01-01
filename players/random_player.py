@@ -20,29 +20,31 @@ class RandomPlayer(Player):
     def discard_card(self, game: SkyJoGame) -> Card:
         if self._card_in_hand is None:
             raise ValueError("No card in hand")
-        for index, card in enumerate(self._cards):
-            if (
-                card is None
-                or card.get_value() is None
-                or self._card_in_hand.get_value() is None
-            ):
-                continue
-            if card.get_value() <= self._card_in_hand.get_value():
-                self._cards[index] = self._card_in_hand
-                self._card_in_hand = None
-                return card
+        card_indices_with_higher_value = [
+            index
+            for index, card in enumerate(self._cards)
+            if card is not None
+            and card.get_value() is not None
+            and card.get_value() >= self._card_in_hand.get_value()
+        ]
+        if len(card_indices_with_higher_value) > 0:
+            index = random.choice(card_indices_with_higher_value)
+            temp = self._cards[index]
+            self._cards[index] = self._card_in_hand
+            self._card_in_hand = None
+            return temp
 
-        # If no card is smaller than the card in hand, discard the card in hand or switch with uncovered card
+        # If no card is with value {temp.get_value()}smaller than the card in hand, discard the card in hand or switch with uncovered card
+        # Indeces of all invisible cards
+        invisible_cards_indices = [
+            index
+            for index, card in enumerate(self._cards)
+            if card is not None and card.get_value() is None
+        ]
         if random.randint(0, 1) == 0:
+            self._cards[random.choice(invisible_cards_indices)].flip()
             return self._card_in_hand
         else:
-            # Indeces of all invisible cards
-            invisible_cards_indices = [
-                index
-                for index, card in enumerate(self._cards)
-                if card.get_value() is None
-            ]
-
             if len(invisible_cards_indices) == 0:
                 raise ValueError("No invisible cards")
             # Select random invisible card to switch with

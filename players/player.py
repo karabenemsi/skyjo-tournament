@@ -2,17 +2,18 @@ from card import Card
 
 
 class Player:
-    def __init__(self, id: int):
+    def __init__(self, id: str, settings: dict = None):
         self.id = id
         self._cards: list[
             Card | None
         ] = []  # list of cards, starting from top left corner
         self._card_in_hand: Card | None = None
         self._score = 0
+        self._settings = settings
 
     def give_cards(self, cards: list[int]):
         # receive cards from dealer
-        self._cards = cards
+        self._cards = cards.copy()
 
     def remove_all_cards(self):
         # receive cards from dealer
@@ -22,12 +23,20 @@ class Player:
         return self._cards
 
     def flip_card(self, index: int):
-        self.card[index].flip()
+        self._cards[index].flip()
 
     def are_all_cards_visible(self) -> bool:
         return all(
             card.get_value() is not None for card in self._cards if card is not None
         )
+
+    def print_cards(self):
+        print(f"{self.id} has cards:")
+        for index, card in enumerate(self._cards):
+            print(card if card is not None else "X ", end=" ")
+            if index % 4 == 3 and index != 11:
+                print()
+        print()
 
     def discard_filled_column(self) -> list[Card]:
         # Cards indexes are ordered like this:
@@ -40,7 +49,8 @@ class Player:
             column_cards = [self._cards[i], self._cards[i + 4], self._cards[i + 8]]
             if all(
                 (
-                    card.get_value() == column_cards[0].get_value()
+                    card is not None
+                    and card.get_value() == column_cards[0].get_value()
                     and card.get_value() is not None
                 )
                 for card in column_cards
@@ -49,12 +59,13 @@ class Player:
                 self._cards[i] = None
                 self._cards[i + 4] = None
                 self._cards[i + 8] = None
-        self._cards = [card for card in self._cards if card is not None]
+        # if len(discarded_cards) > 0:
+        #     print("Full Column, Discarded cards:", discarded_cards)
         return discarded_cards
 
     def sum_of_uncovered_cards(self) -> int:
         return sum(
-            card.get_value() for card in self._cards if card.get_value() is not None
+            card.get_value() for card in self._cards if card is not None and card.get_value() is not None
         )
 
     def get_score(self):
@@ -62,10 +73,13 @@ class Player:
 
     def sum_up_score(self):
         for card in self._cards:
-            if card.get_value() is None:
+            if card is not None and card.get_value() is None:
                 card.flip()
 
-        self._score += sum(card.get_value() for card in self._cards)
+        self._score += self.sum_of_uncovered_cards()
+    
+    def add_penalty(self):
+        self._score += self.sum_of_uncovered_cards()
 
     # These functions have to be implemented by the player
     def start_round(self):
