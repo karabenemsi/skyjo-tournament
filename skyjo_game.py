@@ -127,7 +127,15 @@ class SkyJoGame:
 
     def player_turn(self, player: Player):
         # TODO: Check if player is doing a valid turn
+        game_cards = len(self._cards) + len(self._discard_pile)
+        discarded_cards_count = len(self._discard_pile)
         player.draw_card(self)
+        # Check if player poped on and only one card from discard or deck
+        if len(self._cards) + len(self._discard_pile) != game_cards - 1:
+            raise ValueError("Player did not draw one card")
         self._put_on_discard(player.discard_card(self))
+        # Check if player put on one card on discard pile
+        if len(self._discard_pile) != discarded_cards_count + 1:
+            raise ValueError("Player did not discard one card")
         # Check if player has 3 same cards in column
         self._put_on_discard(player.discard_filled_column())
