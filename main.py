@@ -6,7 +6,6 @@ from players.min_max_player import MinMaxPlayer
 if __name__ == "__main__":
     players = [
         RandomPlayer("Random Jürgen"),
-        RandomPlayer("Random Peter"),
         MinMaxPlayer("MinMax Joachim"),
     ]
     scores = {player.id: 0 for player in players}

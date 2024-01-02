@@ -20,6 +20,9 @@ class RandomPlayer(Player):
     def discard_card(self, game: SkyJoGame) -> Card:
         if self._card_in_hand is None:
             raise ValueError("No card in hand")
+        
+        # Three options: keep card in hand and trade for uncovered card, keep card in hand and trade for covered card, discard card in hand
+        
         card_indices_with_higher_value = [
             index
             for index, card in enumerate(self._cards)
