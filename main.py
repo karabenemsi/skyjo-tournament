@@ -7,6 +7,7 @@ if __name__ == "__main__":
     players = [
         RandomPlayer("Random Jürgen"),
         MinMaxPlayer("MinMax Joachim"),
+        # CustomPlayer("CustomPlayer"), # Add your player here
     ]
     scores = {player.id: 0 for player in players}
     for i in range(1000):
