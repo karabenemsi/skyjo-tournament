@@ -1,3 +1,6 @@
+from typing import overload
+
+
 class Card:
     def __init__(self, value: int):
         self._value = value
@@ -6,8 +9,8 @@ class Card:
     def flip(self):
         self._visible = not self._visible
 
-    def get_value(self):
-        return self._value if self._visible else None
+    def get_value(self, noneValue: int = None) -> int:
+        return self._value if self._visible else noneValue
 
     def peak(self):
         return self._value

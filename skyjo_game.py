@@ -94,7 +94,18 @@ class SkyJoGame:
             card.flip()
         self._discard_pile.append(card)
 
+    def _fill_deck_from_discard(self):
+        # Move all cards from discard pile to deck, except the top card
+        while len(self._discard_pile) > 1:
+            temp_card = self._discard_pile.pop()
+            temp_card.flip()  # Flip card before adding to deck (to make it invisible again)
+            self._cards.append(temp_card)
+        # Shuffle the deck
+        random.shuffle(self._cards)
+
     def pop_top_card(self):
+        if len(self._cards) == 0:
+            self._fill_deck_from_discard()
         card = self._cards.pop()
         card.flip()
         return card
@@ -129,8 +140,15 @@ class SkyJoGame:
         # TODO: Check if player is doing a valid turn
         game_cards = len(self._cards) + len(self._discard_pile)
         discarded_cards_count = len(self._discard_pile)
+        # print("Number of cards in game (not in players decks):", game_cards)
         player.draw_card(self)
         # Check if player poped on and only one card from discard or deck
+        # print(
+        #     "Number of cards after player draws card",
+        #     len(self._cards) + len(self._discard_pile),
+        #     len(self._cards),
+        #     len(self._discard_pile),
+        # )
         if len(self._cards) + len(self._discard_pile) != game_cards - 1:
             raise ValueError(f"{player.id} did not draw one card")
         self._put_on_discard(player.discard_card(self))

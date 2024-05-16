@@ -4,9 +4,9 @@ from card import Card
 class Player:
     def __init__(self, id: str, settings: dict = None):
         self.id = id
-        self._cards: list[
-            Card | None
-        ] = []  # list of cards, starting from top left corner
+        self._cards: list[Card | None] = (
+            []
+        )  # list of cards, starting from top left corner
         self._card_in_hand: Card | None = None
         self._score = 0
         self._settings = settings
@@ -65,7 +65,9 @@ class Player:
 
     def sum_of_uncovered_cards(self) -> int:
         return sum(
-            card.get_value() for card in self._cards if card is not None and card.get_value() is not None
+            card.get_value()
+            for card in self._cards
+            if card is not None and card.get_value() is not None
         )
 
     def get_score(self):
@@ -77,7 +79,7 @@ class Player:
                 card.flip()
 
         self._score += self.sum_of_uncovered_cards()
-    
+
     def add_penalty(self):
         self._score += self.sum_of_uncovered_cards()
 
