@@ -5,6 +5,9 @@ from card import Card
 
 class SkyJoGame:
     def __init__(self, players: list[Player]):
+        # Max number of players
+        if len(players) > 6 :
+            raise ValueError("Too many players")
         # New turn order every game
         random.shuffle(players)
         self.players: list[Player] = players
@@ -14,6 +17,10 @@ class SkyJoGame:
         self._discard_pile: list[Card] = []
 
     def play_game(self) -> str:
+        # Reset players
+        for player in self.players:
+            player.reset_game_score()
+
         # Play rounds until a player has 100 points
         winner_id = None
         while winner_id is None:
@@ -27,6 +34,7 @@ class SkyJoGame:
         self._reset_cards()
         self._deal_cards()
 
+        # print("Round no.", self.round)
         for player in self.players:
             player.start_round()
 
@@ -41,6 +49,9 @@ class SkyJoGame:
                     self._final_turn(player.id)
                     round_finished = True
                     break
+        for player in self.players:
+            player.add_round_to_game_score()
+            player.reset_round_score()
 
     # Sorts players for a new round,
     def _get_players_ordered(self, id_of_last_player_to_end_round: str = None):
@@ -114,9 +125,9 @@ class SkyJoGame:
         # for player in self.players:
         #     print(f"{player.id} has {player.get_score()} points")
         for player in self.players:
-            if player.get_score() >= 100:
+            if player.get_game_score() >= 100:
                 # Find player with lowest score
-                lowest_id = min(self.players, key=lambda x: x.get_score()).id
+                lowest_id = min(self.players, key=lambda x: x.get_game_score()).id
                 return [player.id for player in self.players if player.id == lowest_id][
                     0
                 ]
@@ -130,18 +141,20 @@ class SkyJoGame:
         # All players except current player get one more turn
         for player in self.players[1:]:
             self.player_turn(player)
-            player.sum_up_score()
+        # Sum up score for each player
+        for player in self.players:
+            player.sum_up_round()
         # If current player has not lowest score, add penalty by adding card sum to score
-        if min(self.players, key=lambda x: x.get_score()).id != closing_player_id:
+        if min(self.players, key=lambda x: x.get_round_score()).id != closing_player_id:
             # print(f"{closing_player_id} has not lowest score, adding penalty")
             self.players[0].add_penalty()
 
     def player_turn(self, player: Player):
         # TODO: Check if player is doing a valid turn
         game_cards = len(self._cards) + len(self._discard_pile)
+        player.draw_card(self)
         discarded_cards_count = len(self._discard_pile)
         # print("Number of cards in game (not in players decks):", game_cards)
-        player.draw_card(self)
         # Check if player poped on and only one card from discard or deck
         # print(
         #     "Number of cards after player draws card",
@@ -151,10 +164,12 @@ class SkyJoGame:
         # )
         if len(self._cards) + len(self._discard_pile) != game_cards - 1:
             raise ValueError(f"{player.id} did not draw one card")
-        self._put_on_discard(player.discard_card(self))
+        discarded_card = player.discard_card(self)
+        if discarded_card == None:
+            raise ValueError("Player Discarded empty")
+        self._put_on_discard(discarded_card)
         # Check if player put on one card on discard pile
-        # TODO: This check sometimes fails probably because of a bug in the discard_card function or a timing issue
-        # if len(self._discard_pile) != discarded_cards_count + 1:
-        #     raise ValueError(f"{player.id} did not discard one card")
+        if len(self._discard_pile) != discarded_cards_count + 1:
+            raise ValueError(f"{player.id} did not discard one card")
         # Check if player has 3 same cards in column
         self._put_on_discard(player.discard_filled_column())

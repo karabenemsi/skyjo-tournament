@@ -8,7 +8,8 @@ class Player:
             []
         )  # list of cards, starting from top left corner
         self._card_in_hand: Card | None = None
-        self._score = 0
+        self._round_score = 0
+        self._game_score = 0
         self._settings = settings
 
     def give_cards(self, cards: list[int]):
@@ -36,6 +37,10 @@ class Player:
             print(card if card is not None else "X ", end=" ")
             if index % 4 == 3 and index != 11:
                 print()
+        if(self._card_in_hand):
+            print(f"Card in hand: {self._card_in_hand}")
+        if(self.are_all_cards_visible()):
+            print(f"\nCard Value {self.sum_of_uncovered_cards()}")
         print()
 
     def discard_filled_column(self) -> list[Card]:
@@ -70,18 +75,32 @@ class Player:
             if card is not None and card.get_value() is not None
         )
 
-    def get_score(self):
-        return self._score
+    def get_round_score(self):
+        return self._round_score
 
-    def sum_up_score(self):
+    def get_game_score(self):
+        return self._game_score
+
+    """ Flips all cards and sums up value for this round
+    """
+    def sum_up_round(self):
         for card in self._cards:
             if card is not None and card.get_value() is None:
                 card.flip()
 
-        self._score += self.sum_of_uncovered_cards()
+        self._round_score += self.sum_of_uncovered_cards()
 
     def add_penalty(self):
-        self._score += self.sum_of_uncovered_cards()
+        self._round_score += self.sum_of_uncovered_cards()
+
+    def reset_round_score(self):
+        self._round_score = 0
+
+    def add_round_to_game_score(self):
+        self._game_score += self._round_score
+
+    def reset_game_score(self):
+        self._game_score = 0
 
     # These functions have to be implemented by the player
     def start_round(self):
