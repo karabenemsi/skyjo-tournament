@@ -6,7 +6,7 @@ from card import Card
 class SkyJoGame:
     def __init__(self, players: list[Player]):
         # Max number of players
-        if len(players) > 6 :
+        if len(players) > 8:
             raise ValueError("Too many players")
         # New turn order every game
         random.shuffle(players)
@@ -168,8 +168,40 @@ class SkyJoGame:
         if discarded_card == None:
             raise ValueError("Player Discarded empty")
         self._put_on_discard(discarded_card)
+        # for p in self.players:
+        #     p.hook_card_discarded(self, player.id, [discarded_card])
         # Check if player put on one card on discard pile
         if len(self._discard_pile) != discarded_cards_count + 1:
             raise ValueError(f"{player.id} did not discard one card")
         # Check if player has 3 same cards in column
-        self._put_on_discard(player.discard_filled_column())
+        discarded_column = player.discard_filled_column()
+        if len(discarded_column) > 0:
+            self._put_on_discard(discarded_column)
+            # for p in self.players:
+            #     p.hook_card_discarded(
+            #         player.id, [x.get_value() for x in discarded_column]
+            #     )
+
+    def get_card_infos():
+        return {
+            "available_cards": range(-2, 13),
+            "distribution": {
+                -2: 5,
+                -1: 10,
+                0: 15,
+                1: 10,
+                2: 10,
+                3: 10,
+                4: 10,
+                5: 10,
+                6: 10,
+                7: 10,
+                8: 10,
+                9: 10,
+                10: 10,
+                11: 10,
+                12: 10,
+            },
+            "card_count": 150,
+            "card_sum": 760,
+        }

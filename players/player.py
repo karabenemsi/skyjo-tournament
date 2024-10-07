@@ -1,10 +1,11 @@
+from typing import List
 from card import Card
 
 
 class Player:
     def __init__(self, id: str, settings: dict = None):
         self.id = id
-        self._cards: list[Card | None] = (
+        self._cards: List[Card | None] = (
             []
         )  # list of cards, starting from top left corner
         self._card_in_hand: Card | None = None
@@ -37,9 +38,9 @@ class Player:
             print(card if card is not None else "X ", end=" ")
             if index % 4 == 3 and index != 11:
                 print()
-        if(self._card_in_hand):
+        if self._card_in_hand:
             print(f"Card in hand: {self._card_in_hand}")
-        if(self.are_all_cards_visible()):
+        if self.are_all_cards_visible():
             print(f"\nCard Value {self.sum_of_uncovered_cards()}")
         print()
 
@@ -83,6 +84,7 @@ class Player:
 
     """ Flips all cards and sums up value for this round
     """
+
     def sum_up_round(self):
         for card in self._cards:
             if card is not None and card.get_value() is None:
@@ -115,3 +117,11 @@ class Player:
     def discard_card(self, game) -> Card:
         # do turn
         pass
+
+    # def hook_card_discarded(
+    #     self, game: SkyJoGame, player_id: str, card_value: List[int]
+    # ):
+        pass
+
+    # def inform_game_deck_filled_from_discard(self, game):
+    #     pass

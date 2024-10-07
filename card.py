@@ -3,6 +3,7 @@ from typing import overload
 
 class Card:
     def __init__(self, value: int):
+        self.id : str | None = None
         self._value = value
         self._visible = False
 
@@ -11,6 +12,9 @@ class Card:
 
     def get_value(self, noneValue: int = None) -> int:
         return self._value if self._visible else noneValue
+
+    def is_visible(self):
+        return self._visible
 
     def peak(self):
         return self._value
